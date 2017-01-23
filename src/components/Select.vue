@@ -190,8 +190,8 @@
 							@keydown.up.prevent="typeAheadUp"
 							@keydown.down.prevent="typeAheadDown"
 							@keyup.enter.prevent="typeAheadSelect"
-							@blur="open = false"
-							@focus="open = true"
+							@blur="onBlur"
+							@focus="onFocus"
 							type="search"
 							class="form-control"
 							:placeholder="searchPlaceholder"
@@ -395,7 +395,8 @@
 		data() {
 			return {
 				search: '',
-				open: false
+				open: false,
+				ignoreBlur: false
 			}
 		},
 
@@ -418,7 +419,19 @@
 		},
 
 		methods: {
-
+			onFocus(e) {
+				this.ignoreBlur = false;
+				this.open = true;
+			},
+			onBlur(e) {
+				console.log(document.activeElement);
+				if(!this.ignoreBlur && this.$refs.dropdownMenu === document.activeElement) {
+					this.ignoreBlur = true;
+					this.open = true;
+					return;
+				}
+				this.open = false;
+			},
 			/**
 			 * Select a given option.
 			 * @param  {Object||String} option
